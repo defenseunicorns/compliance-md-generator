@@ -7,7 +7,7 @@ const yaml = require("js-yaml");
 // Function to read OSCAL YAML files to grab unique component IDs
 async function readAndProcessYaml() {
   try {
-    const data = await fs.readFile("/defense-unicorns-distro/oscal-component.yaml", "utf8");
+    const data = await fs.readFile("../defense-unicorns-distro/oscal-component.yaml", "utf8");
     const content = yaml.load(data);
 
     console.log("Parsed YAML content:", content);

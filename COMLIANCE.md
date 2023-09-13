@@ -49,6 +49,9 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
   <summary>Administrative Controls</summary>
 
 - AC-1
+- AC-11
+- AC-11(1)
+- AC-17
 - AC-20
 - AC-20(1)
 - AC-20(2)
@@ -76,6 +79,7 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - CM-3(4)
 - CM-4
 - CM-7(1)
+- CM-8(4)
 - CM-9
 - CM-10
 - CM-12
@@ -118,6 +122,7 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - IR-3
 - IR-3(2)
 - IR-4
+- IR-4(4)
 - IR-4(11)
 - IR-5
 - IR-6
@@ -147,6 +152,8 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - MP-6(2)
 - MP-6(3)
 - MP-7
+- PL-10
+- PL-11
 - PE-1
 - PE-2
 - PE-3
@@ -191,6 +198,8 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - RA-2
 - RA-3
 - RA-3(1)
+- RA-5(4)
+- RA-5(11)
 - RA-7
 - RA-9
 - SA-1
@@ -213,6 +222,8 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - SA-21
 - SA-22
 - SC-1
+- SC-18
+- SC-24
 - SI-1
 - SI-5
 - SI-5(1)
@@ -246,9 +257,13 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 - AC-18(5)
 - AC-19
 - AC-19(5)
+- CA-8
+- CA-8(1)
+- CM-2(7)
 - CP-10
 - CP-10(2)
 - CP-10(4)
+- SC-15
 - SI-4(14)
 - SI-8
 - SI-8(2)

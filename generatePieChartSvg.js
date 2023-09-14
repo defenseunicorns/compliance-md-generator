@@ -505,9 +505,9 @@ async function graph(data, baseline, totalControls) {
 // Function to trigger pie charts and provides the data needed for NIST 800-53 Charts
 async function createGraphs(nistHighComparison, nistModerateComparison, nistLowComparison) {
   const datasets = [
-    { data: nistHighComparison, baseline: "NistHighComparison", totalControls: 172 },
-    { data: nistModerateComparison, baseline: "NistModerateComparison", totalControls: 130 },
-    { data: nistLowComparison, baseline: "NistLowComparison", totalControls: 57 },
+    { data: nistHighComparison, baseline: "NistHighComparison", totalControls: 157 },
+    { data: nistModerateComparison, baseline: "NistModerateComparison", totalControls: 121 },
+    { data: nistLowComparison, baseline: "NistLowComparison", totalControls: 52 },
   ];
   for (const { data, baseline, totalControls } of datasets) {
 

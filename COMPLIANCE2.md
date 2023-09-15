@@ -1,35 +1,20 @@
 # Defense Unicorns Big Bang Distro (DUBBD) Compliance
 
-## Compliance In A Half Shell
-DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DUBBD uses an opinionated breakdown of controls that fall into one of three categories, Administrative (These controls can't be met by the tech stack IE creating an Access Policy), Technical (These controls are met by the tech stack), and Not Applicable (These controls could be met by a tech stack but do not align with our goal with DUBBD IE VOIP/Wireless Controls). The visuals below exclude Administrative and Not Applicable controls and focuses only on the Technical controls.
+## Compliance In A Nutshell
+
+DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DUBBD uses an opinionated breakdown of controls that fall into one of three categories:
+
+- Administrative (These controls can't be met by the tech stack IE creating an Access Policy)
+- Technical (These controls are met by the tech stack)
+- Not Applicable (These controls could be met by a tech stack but do not align with our goal with DUBBD IE VOIP/Wireless Controls).
+
+The visuals below exclude Administrative and Not Applicable controls and focuses only on the Technical controls.
 
 <br>
 
-<table>
-<tr>
-<td>
+# Bar Graph
 
-## NIST 800-53 High
-
-<img src="./compliance-images/NistHighComparison.svg" alt="NIST High"/>
-
-</td>
-<td>
-
-## NIST 800-53 Moderate
-
-<img src="./compliance-images/NistModerateComparison.svg" alt="NIST Moderate"/>
-
-</td>
-<td>
-
-## NIST 800-53 Low
-
-<img src="./compliance-images/NistLowComparison.svg" alt="NIST Low"/>
-
-</td>
-</tr>
-</table>
+<img src="./compliance-images/horizontal-bar-graph.png" alt="Percent of Controls Met Per Baseline"/>
 
 <br>
 
@@ -37,7 +22,7 @@ DUBBD utilizes OSCAL to map compliance frameworks controls to the tech stack. DU
 
 ## Control Family Breakdown
 
-<img src="./compliance-images/donutChart.svg" alt="NIST Low"/>
+<img src="./compliance-images/donutChart.svg" alt="Control Family Breakdown"/>
 
 </div>
 

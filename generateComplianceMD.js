@@ -3,11 +3,12 @@ const fs = require("fs").promises;
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const yaml = require("js-yaml");
+const sharp = require('sharp');
 
 // Function to read OSCAL YAML files to grab unique component IDs
-async function readAndProcessYaml() {
+async function readAndProcessYaml(oscalFilePath) {
   try {
-    const data = await fs.readFile("../defense-unicorns-distro/oscal-component.yaml", "utf8");
+    const data = await fs.readFile(oscalFilePath, "utf8");
     const content = yaml.load(data);
 
     console.log("Parsed YAML content:", content);
@@ -429,8 +430,8 @@ const nistLowBaseline = [
 }
 
 // Function to create the pie charts
-async function graph(data, baseline, totalControls) {
-  console.log("Data for D3:", data, "Baseline:", baseline);
+async function pieChart(data, baseline, totalControls) {
+  console.log("Data for D3 Pie Chart:", data, "Baseline:", baseline);
 
   // Initialize JSDOM instance
   const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
@@ -485,8 +486,6 @@ async function graph(data, baseline, totalControls) {
     .style("text-anchor", "middle")
     .style("font-size", "25px")
     .style("font-family", "Roboto, sans-serif")
-    // .text((d) => d.data); // This shows text as #
-    // .text((d) => `${((d.data / totalControls) * 100).toFixed(2)}%`); // This shows text as %
     .text((d, i) => {
       const percentage = ((d.data / totalControls) * 100).toFixed(2);
       const label = i === 0 ? "Met" : "Not Met";
@@ -496,7 +495,7 @@ async function graph(data, baseline, totalControls) {
   // Get the SVG content and save it
   const svgContent = dom.window.document.querySelector("svg").outerHTML;
 
-  await fs.writeFile(`./compliance-images/${baseline}.svg`, svgContent);
+  await fs.writeFile(`./compliance-images/pie-chart-${baseline}.svg`, svgContent);
 
   // Remove the SVG from JSDOM to avoid appending multiple SVGs in the same DOM
   dom.window.document.querySelector("svg").remove();
@@ -505,16 +504,152 @@ async function graph(data, baseline, totalControls) {
 // Function to trigger pie charts and provides the data needed for NIST 800-53 Charts
 async function createGraphs(nistHighComparison, nistModerateComparison, nistLowComparison) {
   const datasets = [
-    { data: nistHighComparison, baseline: "NistHighComparison", totalControls: 157 },
-    { data: nistModerateComparison, baseline: "NistModerateComparison", totalControls: 121 },
-    { data: nistLowComparison, baseline: "NistLowComparison", totalControls: 52 },
+    {
+      data: nistHighComparison,
+      label: "High",
+      baseline: "NistHighComparison",
+      // If the # of High Tech controls change update this.
+      totalControls: 157,
+    },
+    {
+      data: nistModerateComparison,
+      label: "Moderate",
+      baseline: "NistModerateComparison",
+      // If the # of Moderate Tech controls change update this.
+      totalControls: 121,
+    },
+    {
+      data: nistLowComparison,
+      label: "Low",
+      baseline: "NistLowComparison",
+      // If the # of Low Tech controls change update this.
+      totalControls: 52,
+    },
   ];
   for (const { data, baseline, totalControls } of datasets) {
 
-    await graph(data, baseline, totalControls);
+    await pieChart(data, baseline, totalControls);
   }
+  
+  const combinedDataset = datasets.map(dataset => ({
+    label: dataset.label,
+    value: dataset.data.matchingItems.length,
+    baseline: dataset.baseline,
+    totalControls: dataset.totalControls
+  })); 
+  console.log("This is the combined data var", combinedDataset);
+  await horizontalBarGraph(combinedDataset);
+}
+// --------------------------------------------------------------------------------
+
+async function horizontalBarGraph(data, width = 600, height = 400) {
+  console.log("Data for D3 Bar Graph:", data, "Baseline:", data.baseline);
+
+  // Initialize JSDOM instance
+  const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
+  const d3 = await import("d3");
+
+  // Starting point for Margin Sizes
+  const marginLeft = 100;
+  const marginRight = 50;
+  const marginTop = 50;
+  const marginBottom = 50;
+
+  // Create the SVG container
+  const svg = d3
+    .select(dom.window.document.body)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("viewBox", [0, 0, width, height])
+    .attr(
+      "style",
+      "max-width: 100%; height: auto; font: 20px Roboto, sans-serif;"
+    );
+
+  // Create the scales.
+  const x = d3
+    .scaleLinear()
+    .domain([0, 1]) // To-Do Probably change this to 100 so 0-100
+    .range([marginLeft, width - marginRight]);
+
+  const y = d3
+    .scaleBand()
+    .domain(data.map((d) => d.label))
+    .rangeRound([marginTop, height - marginBottom])
+    .padding(0.1);
+
+  // Append a rect for each data point.
+  svg
+    .append("g")
+    .attr("fill", "steelblue") // To-Do probably change color
+    .selectAll()
+    .data(data)
+    .join("rect")
+    .attr("x", x(0))
+    .attr("y", (d) => y(d.label))
+    .attr("width", (d) => x(d.value / d.totalControls) - x(0))
+    .attr("height", y.bandwidth());
+
+  // Append a label for each data point.
+  svg
+    .append("g")
+    .attr("fill", "black") // To-Do probably change color
+    .attr("text-anchor", "end")
+    .selectAll()
+    .data(data)
+    .join("text")
+    .attr("x", (d) => x(d.value / d.totalControls) - 4)
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .attr("dx", -4)
+    .text((d) => +((d.value / d.totalControls) * 100).toFixed(2) + "%")
+    .call((text) =>
+      text
+        .filter((d) => x(d.value / d.totalControls) - x(0) < 20)
+        .attr("dx", +4)
+        .attr("fill", "red")
+        .attr("text-anchor", "start")
+    );
+
+  // Create the X axes.
+  svg
+    .append("g")
+    .attr("transform", `translate(0,${marginTop})`)
+    .call(d3.axisTop(x).ticks(5, "%"))
+    .call((g) => g.select(".domain").remove())
+    .selectAll("text")
+    .attr("fill", "#F7F8F9") // Font color
+    .style("font-family", "Roboto")
+    .style("font-size", "20px"); // This updates the X Axis labels
+
+  // Create the Y axis
+  svg
+    .append("g")
+    .attr("transform", `translate(${marginLeft},0)`)
+    .call(d3.axisLeft(y).tickSizeOuter(0))
+    .selectAll("text")
+    .style("font-size", "20px") // This updates the Y Axis labels
+    .attr("fill", "#F7F8F9") // Font color
+    .style("font-family", "Roboto");
+
+  // Get the SVG content and save it
+  const svgContent = dom.window.document.querySelector("svg").outerHTML;
+
+  // Convert SVG to PNG buffer using svg-to-img
+  const pngBuffer = await sharp(Buffer.from(svgContent)).toBuffer();
+  await fs.writeFile(`./compliance-images/horizontal-bar-graph.png`, pngBuffer);
+
+  // Use sharp to process the image and save it
+  await sharp(pngBuffer)
+    .png()
+    .toFile("./compliance-images/horizontal-bar-graph.png");
+
+  // Remove the SVG from JSDOM to avoid appending multiple SVGs in the same DOM
+  dom.window.document.querySelector("svg").remove();
 }
 
+// --------------------------------------------------------------------------------
 // Function for grouping control families
 function groupByControlFamily(uniqueControlIds) {
   // Define the control families
@@ -661,7 +796,17 @@ async function generateDonutSVG(uniqueControlIds, width = 500) {
 // Function that orchestrates the entire process and ensures the correct data is passed between functions.
 async function main() {
   try {
-    const uniqueControlIds = await readAndProcessYaml();
+    
+    // The first two values in argv are the path to node and the path to your script.
+    const args = process.argv.slice(2);
+
+    // Set the default file path
+    const defaultOscalFilePath =
+      "./defense-unicorns-distro/oscal-component.yaml";
+
+    const oscalFilePath = args.length > 0 ? args[0] : defaultOscalFilePath;
+
+    const uniqueControlIds = await readAndProcessYaml(oscalFilePath);
 
     if (uniqueControlIds) {
       // Call the new function to get grouped control IDs by family
@@ -689,3 +834,12 @@ async function main() {
 
   // Call the main function
   main();
+
+
+
+  const args = process.argv.slice(2); // The first two values in argv are the path to node and the path to your script.
+
+  // Set the default file path
+  const defaultOscalFilePath = "./defense-unicorns-distro";
+
+  const oscalFilePath = args.length > 0 ? args[0] : defaultOscalFilePath;

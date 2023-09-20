@@ -3,15 +3,14 @@ const fs = require("fs").promises;
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const yaml = require("js-yaml");
-const sharp = require('sharp');
+const sharp = require("sharp");
+const { group } = require("console");
 
 // Function to read OSCAL YAML files to grab unique component IDs
 async function readAndProcessYaml(oscalFilePath) {
   try {
     const data = await fs.readFile(oscalFilePath, "utf8");
     const content = yaml.load(data);
-
-    console.log("Parsed YAML content:", content);
 
     let controlIds = [];
 
@@ -35,9 +34,6 @@ async function readAndProcessYaml(oscalFilePath) {
     }
 
     const uniqueControlIds = [...new Set(controlIds)];
-    console.log(uniqueControlIds);
-    console.log(content);
-    // return uniqueControlIds
     return uniqueControlIds;
   } catch (err) {
     console.error("Error reading the file:", err);
@@ -65,344 +61,343 @@ function compareControls(uniqueControlIds, baseline) {
 
 // Function to trigger the comparison and stores the data
 async function createComparison(uniqueControlIds) {
-  console.log("Unique Control IDs:", uniqueControlIds);
   // NIST Baseline controls in OSCAL format
-const nistHighBaseline = [
-  "ac-2",
-  "ac-2.1",
-  "ac-2.2",
-  "ac-2.3",
-  "ac-2.4",
-  "ac-2.5",
-  "ac-2.11",
-  "ac-2.12",
-  "ac-2.13",
-  "ac-3",
-  "ac-4",
-  "ac-4.4",
-  "ac-5",
-  "ac-6",
-  "ac-6.1",
-  "ac-6.2",
-  "ac-6.3",
-  "ac-6.5",
-  "ac-6.7",
-  "ac-6.9",
-  "ac-6.10",
-  "ac-7",
-  "ac-8",
-  "ac-10",
-  "ac-12",
-  "ac-17.1",
-  "ac-17.2",
-  "ac-17.3",
-  "ac-17.4",
-  "au-2",
-  "au-3",
-  "au-3.1",
-  "au-4",
-  "au-5",
-  "au-5.1",
-  "au-5.2",
-  "au-6",
-  "au-6.1",
-  "au-6.3",
-  "au-6.5",
-  "au-6.6",
-  "au-7",
-  "au-7.1",
-  "au-8",
-  "au-9",
-  "au-9.2",
-  "au-9.3",
-  "au-9.4",
-  "au-10",
-  "au-11",
-  "au-12",
-  "au-12.1",
-  "au-12.3",
-  "ca-7",
-  "ca-7.4",
-  "ca-9",
-  "cm-2",
-  "cm-2.2",
-  "cm-2.3",
-  "cm-3.2",
-  "cm-3.6",
-  "cm-4.1",
-  "cm-4.2",
-  "cm-5",
-  "cm-5.1",
-  "cm-6",
-  "cm-6.1",
-  "cm-6.2",
-  "cm-7",
-  "cm-7.2",
-  "cm-7.5",
-  "cm-8",
-  "cm-8.1",
-  "cm-8.2",
-  "cm-8.3",
-  "cm-11",
-  "cm-12.1",
-  "cp-9",
-  "cp-9.1",
-  "cp-9.2",
-  "cp-9.3",
-  "cp-9.5",
-  "cp-9.8",
-  "ia-2",
-  "ia-2.1",
-  "ia-2.2",
-  "ia-2.5",
-  "ia-2.8",
-  "ia-2.12",
-  "ia-3",
-  "ia-4",
-  "ia-4.4",
-  "ia-5",
-  "ia-5.1",
-  "ia-5.2",
-  "ia-5.6",
-  "ia-6",
-  "ia-7",
-  "ia-8",
-  "ia-8.1",
-  "ia-8.2",
-  "ia-8.4",
-  "ia-11",
-  "ir-4.1",
-  "ir-5.1",
-  "mp-2",
-  "ra-5",
-  "ra-5.2",
-  "ra-5.5",
-  "sa-10",
-  "sa-11",
-  "sc-2",
-  "sc-3",
-  "sc-4",
-  "sc-5",
-  "sc-7",
-  "sc-7.3",
-  "sc-7.4",
-  "sc-7.5",
-  "sc-7.7",
-  "sc-7.8",
-  "sc-7.18",
-  "sc-7.21",
-  "sc-8",
-  "sc-8.1",
-  "sc-10",
-  "sc-12",
-  "sc-12.1",
-  "sc-13",
-  "sc-17",
-  "sc-20",
-  "sc-21",
-  "sc-22",
-  "sc-23",
-  "sc-28",
-  "sc-28.1",
-  "sc-39",
-  "si-2",
-  "si-2.2",
-  "si-3",
-  "si-4",
-  "si-4.2",
-  "si-4.4",
-  "si-4.5",
-  "si-4.10",
-  "si-4.12",
-  "si-4.20",
-  "si-4.22",
-  "si-7",
-  "si-7.1",
-  "si-7.2",
-  "si-7.5",
-  "si-7.7",
-  "si-7.15",
-  "si-10",
-  "si-11",
-  "si-16",
-];
-const nistModerateBaseline = [
-  "ac-2",
-  "ac-2.1",
-  "ac-2.2",
-  "ac-2.3",
-  "ac-2.4",
-  "ac-2.5",
-  "ac-2.13",
-  "ac-3",
-  "ac-4",
-  "ac-5",
-  "ac-6",
-  "ac-6.1",
-  "ac-6.2",
-  "ac-6.5",
-  "ac-6.7",
-  "ac-6.9",
-  "ac-6.10",
-  "ac-7",
-  "ac-8",
-  "ac-12",
-  "ac-17.1",
-  "ac-17.2",
-  "ac-17.3",
-  "ac-17.4",
-  "au-2",
-  "au-3",
-  "au-3.1",
-  "au-4",
-  "au-5",
-  "au-6",
-  "au-6.1",
-  "au-6.3",
-  "au-7",
-  "au-7.1",
-  "au-8",
-  "au-9",
-  "au-9.4",
-  "au-11",
-  "au-12",
-  "ca-7",
-  "ca-7.4",
-  "ca-9",
-  "cm-2",
-  "cm-2.2",
-  "cm-2.3",
-  "cm-3.2",
-  "cm-4.2",
-  "cm-5",
-  "cm-6",
-  "cm-7",
-  "cm-7.2",
-  "cm-7.5",
-  "cm-8",
-  "cm-8.1",
-  "cm-8.3",
-  "cm-11",
-  "cm-12.1",
-  "cp-9",
-  "cp-9.1",
-  "cp-9.8",
-  "ia-2",
-  "ia-2.1",
-  "ia-2.2",
-  "ia-2.8",
-  "ia-2.12",
-  "ia-3",
-  "ia-4",
-  "ia-4.4",
-  "ia-5",
-  "ia-5.1",
-  "ia-5.2",
-  "ia-5.6",
-  "ia-6",
-  "ia-7",
-  "ia-8",
-  "ia-8.1",
-  "ia-8.2",
-  "ia-8.4",
-  "ia-11",
-  "ir-4.1",
-  "mp-2",
-  "ra-5",
-  "ra-5.2",
-  "ra-5.5",
-  "sa-10",
-  "sa-11",
-  "sc-2",
-  "sc-4",
-  "sc-5",
-  "sc-7",
-  "sc-7.3",
-  "sc-7.4",
-  "sc-7.5",
-  "sc-7.7",
-  "sc-7.8",
-  "sc-8",
-  "sc-8.1",
-  "sc-10",
-  "sc-12",
-  "sc-13",
-  "sc-17",
-  "sc-20",
-  "sc-21",
-  "sc-22",
-  "sc-23",
-  "sc-28",
-  "sc-28.1",
-  "sc-39",
-  "si-2",
-  "si-2.2",
-  "si-3",
-  "si-4",
-  "si-4.2",
-  "si-4.4",
-  "si-4.5",
-  "si-7",
-  "si-7.1",
-  "si-7.7",
-  "si-10",
-  "si-11",
-  "si-16",
-];
-const nistLowBaseline = [
-  "ac-2",
-  "ac-3",
-  "ac-7",
-  "ac-8",
-  "au-2",
-  "au-3",
-  "au-4",
-  "au-5",
-  "au-6",
-  "au-8",
-  "au-9",
-  "au-11",
-  "au-12",
-  "ca-7",
-  "ca-7.4",
-  "ca-9",
-  "cm-2",
-  "cm-5",
-  "cm-6",
-  "cm-7",
-  "cm-8",
-  "cm-11",
-  "cp-9",
-  "ia-2",
-  "ia-2.1",
-  "ia-2.2",
-  "ia-2.8",
-  "ia-2.12",
-  "ia-4",
-  "ia-5",
-  "ia-5.1",
-  "ia-6",
-  "ia-7",
-  "ia-8",
-  "ia-8.1",
-  "ia-8.2",
-  "ia-8.4",
-  "ia-11",
-  "mp-2",
-  "ra-5",
-  "ra-5.2",
-  "sc-5",
-  "sc-7",
-  "sc-12",
-  "sc-13",
-  "sc-20",
-  "sc-21",
-  "sc-22",
-  "sc-39",
-  "si-2",
-  "si-3",
-  "si-4",
-];
+  const nistHighBaseline = [
+    "ac-2",
+    "ac-2.1",
+    "ac-2.2",
+    "ac-2.3",
+    "ac-2.4",
+    "ac-2.5",
+    "ac-2.11",
+    "ac-2.12",
+    "ac-2.13",
+    "ac-3",
+    "ac-4",
+    "ac-4.4",
+    "ac-5",
+    "ac-6",
+    "ac-6.1",
+    "ac-6.2",
+    "ac-6.3",
+    "ac-6.5",
+    "ac-6.7",
+    "ac-6.9",
+    "ac-6.10",
+    "ac-7",
+    "ac-8",
+    "ac-10",
+    "ac-12",
+    "ac-17.1",
+    "ac-17.2",
+    "ac-17.3",
+    "ac-17.4",
+    "au-2",
+    "au-3",
+    "au-3.1",
+    "au-4",
+    "au-5",
+    "au-5.1",
+    "au-5.2",
+    "au-6",
+    "au-6.1",
+    "au-6.3",
+    "au-6.5",
+    "au-6.6",
+    "au-7",
+    "au-7.1",
+    "au-8",
+    "au-9",
+    "au-9.2",
+    "au-9.3",
+    "au-9.4",
+    "au-10",
+    "au-11",
+    "au-12",
+    "au-12.1",
+    "au-12.3",
+    "ca-7",
+    "ca-7.4",
+    "ca-9",
+    "cm-2",
+    "cm-2.2",
+    "cm-2.3",
+    "cm-3.2",
+    "cm-3.6",
+    "cm-4.1",
+    "cm-4.2",
+    "cm-5",
+    "cm-5.1",
+    "cm-6",
+    "cm-6.1",
+    "cm-6.2",
+    "cm-7",
+    "cm-7.2",
+    "cm-7.5",
+    "cm-8",
+    "cm-8.1",
+    "cm-8.2",
+    "cm-8.3",
+    "cm-11",
+    "cm-12.1",
+    "cp-9",
+    "cp-9.1",
+    "cp-9.2",
+    "cp-9.3",
+    "cp-9.5",
+    "cp-9.8",
+    "ia-2",
+    "ia-2.1",
+    "ia-2.2",
+    "ia-2.5",
+    "ia-2.8",
+    "ia-2.12",
+    "ia-3",
+    "ia-4",
+    "ia-4.4",
+    "ia-5",
+    "ia-5.1",
+    "ia-5.2",
+    "ia-5.6",
+    "ia-6",
+    "ia-7",
+    "ia-8",
+    "ia-8.1",
+    "ia-8.2",
+    "ia-8.4",
+    "ia-11",
+    "ir-4.1",
+    "ir-5.1",
+    "mp-2",
+    "ra-5",
+    "ra-5.2",
+    "ra-5.5",
+    "sa-10",
+    "sa-11",
+    "sc-2",
+    "sc-3",
+    "sc-4",
+    "sc-5",
+    "sc-7",
+    "sc-7.3",
+    "sc-7.4",
+    "sc-7.5",
+    "sc-7.7",
+    "sc-7.8",
+    "sc-7.18",
+    "sc-7.21",
+    "sc-8",
+    "sc-8.1",
+    "sc-10",
+    "sc-12",
+    "sc-12.1",
+    "sc-13",
+    "sc-17",
+    "sc-20",
+    "sc-21",
+    "sc-22",
+    "sc-23",
+    "sc-28",
+    "sc-28.1",
+    "sc-39",
+    "si-2",
+    "si-2.2",
+    "si-3",
+    "si-4",
+    "si-4.2",
+    "si-4.4",
+    "si-4.5",
+    "si-4.10",
+    "si-4.12",
+    "si-4.20",
+    "si-4.22",
+    "si-7",
+    "si-7.1",
+    "si-7.2",
+    "si-7.5",
+    "si-7.7",
+    "si-7.15",
+    "si-10",
+    "si-11",
+    "si-16",
+  ];
+  const nistModerateBaseline = [
+    "ac-2",
+    "ac-2.1",
+    "ac-2.2",
+    "ac-2.3",
+    "ac-2.4",
+    "ac-2.5",
+    "ac-2.13",
+    "ac-3",
+    "ac-4",
+    "ac-5",
+    "ac-6",
+    "ac-6.1",
+    "ac-6.2",
+    "ac-6.5",
+    "ac-6.7",
+    "ac-6.9",
+    "ac-6.10",
+    "ac-7",
+    "ac-8",
+    "ac-12",
+    "ac-17.1",
+    "ac-17.2",
+    "ac-17.3",
+    "ac-17.4",
+    "au-2",
+    "au-3",
+    "au-3.1",
+    "au-4",
+    "au-5",
+    "au-6",
+    "au-6.1",
+    "au-6.3",
+    "au-7",
+    "au-7.1",
+    "au-8",
+    "au-9",
+    "au-9.4",
+    "au-11",
+    "au-12",
+    "ca-7",
+    "ca-7.4",
+    "ca-9",
+    "cm-2",
+    "cm-2.2",
+    "cm-2.3",
+    "cm-3.2",
+    "cm-4.2",
+    "cm-5",
+    "cm-6",
+    "cm-7",
+    "cm-7.2",
+    "cm-7.5",
+    "cm-8",
+    "cm-8.1",
+    "cm-8.3",
+    "cm-11",
+    "cm-12.1",
+    "cp-9",
+    "cp-9.1",
+    "cp-9.8",
+    "ia-2",
+    "ia-2.1",
+    "ia-2.2",
+    "ia-2.8",
+    "ia-2.12",
+    "ia-3",
+    "ia-4",
+    "ia-4.4",
+    "ia-5",
+    "ia-5.1",
+    "ia-5.2",
+    "ia-5.6",
+    "ia-6",
+    "ia-7",
+    "ia-8",
+    "ia-8.1",
+    "ia-8.2",
+    "ia-8.4",
+    "ia-11",
+    "ir-4.1",
+    "mp-2",
+    "ra-5",
+    "ra-5.2",
+    "ra-5.5",
+    "sa-10",
+    "sa-11",
+    "sc-2",
+    "sc-4",
+    "sc-5",
+    "sc-7",
+    "sc-7.3",
+    "sc-7.4",
+    "sc-7.5",
+    "sc-7.7",
+    "sc-7.8",
+    "sc-8",
+    "sc-8.1",
+    "sc-10",
+    "sc-12",
+    "sc-13",
+    "sc-17",
+    "sc-20",
+    "sc-21",
+    "sc-22",
+    "sc-23",
+    "sc-28",
+    "sc-28.1",
+    "sc-39",
+    "si-2",
+    "si-2.2",
+    "si-3",
+    "si-4",
+    "si-4.2",
+    "si-4.4",
+    "si-4.5",
+    "si-7",
+    "si-7.1",
+    "si-7.7",
+    "si-10",
+    "si-11",
+    "si-16",
+  ];
+  const nistLowBaseline = [
+    "ac-2",
+    "ac-3",
+    "ac-7",
+    "ac-8",
+    "au-2",
+    "au-3",
+    "au-4",
+    "au-5",
+    "au-6",
+    "au-8",
+    "au-9",
+    "au-11",
+    "au-12",
+    "ca-7",
+    "ca-7.4",
+    "ca-9",
+    "cm-2",
+    "cm-5",
+    "cm-6",
+    "cm-7",
+    "cm-8",
+    "cm-11",
+    "cp-9",
+    "ia-2",
+    "ia-2.1",
+    "ia-2.2",
+    "ia-2.8",
+    "ia-2.12",
+    "ia-4",
+    "ia-5",
+    "ia-5.1",
+    "ia-6",
+    "ia-7",
+    "ia-8",
+    "ia-8.1",
+    "ia-8.2",
+    "ia-8.4",
+    "ia-11",
+    "mp-2",
+    "ra-5",
+    "ra-5.2",
+    "sc-5",
+    "sc-7",
+    "sc-12",
+    "sc-13",
+    "sc-20",
+    "sc-21",
+    "sc-22",
+    "sc-39",
+    "si-2",
+    "si-3",
+    "si-4",
+  ];
 
   // Comparing uniqueControlIds with various NIST baselines
   const nistHighComparison = compareControls(
@@ -413,25 +408,17 @@ const nistLowBaseline = [
     uniqueControlIds,
     nistModerateBaseline
   );
-  const nistLowComparison = compareControls(
-    uniqueControlIds,
-    nistLowBaseline
-  );
-
-  console.log("High Baseline Comparison", nistHighComparison);
-  console.log("Moderate Baseline Comparison", nistModerateComparison);
-  console.log("Low Baseline Comparison", nistLowComparison);
+  const nistLowComparison = compareControls(uniqueControlIds, nistLowBaseline);
 
   return {
     nistHighComparison,
     nistModerateComparison,
-    nistLowComparison
+    nistLowComparison,
   };
 }
 
 // Function to create the pie charts
 async function pieChart(data, baseline, totalControls) {
-  console.log("Data for D3 Pie Chart:", data, "Baseline:", baseline);
 
   // Initialize JSDOM instance
   const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
@@ -495,14 +482,21 @@ async function pieChart(data, baseline, totalControls) {
   // Get the SVG content and save it
   const svgContent = dom.window.document.querySelector("svg").outerHTML;
 
-  await fs.writeFile(`./compliance-images/pie-chart-${baseline}.svg`, svgContent);
+  await fs.writeFile(
+    `./compliance-images/pie-chart-${baseline}.svg`,
+    svgContent
+  );
 
   // Remove the SVG from JSDOM to avoid appending multiple SVGs in the same DOM
   dom.window.document.querySelector("svg").remove();
 }
 
 // Function to trigger pie charts and provides the data needed for NIST 800-53 Charts
-async function createGraphs(nistHighComparison, nistModerateComparison, nistLowComparison) {
+async function createGraphs(
+  nistHighComparison,
+  nistModerateComparison,
+  nistLowComparison
+) {
   const datasets = [
     {
       data: nistHighComparison,
@@ -527,24 +521,20 @@ async function createGraphs(nistHighComparison, nistModerateComparison, nistLowC
     },
   ];
   for (const { data, baseline, totalControls } of datasets) {
-
     await pieChart(data, baseline, totalControls);
   }
-  
-  const combinedDataset = datasets.map(dataset => ({
+
+  const combinedDataset = datasets.map((dataset) => ({
     label: dataset.label,
     value: dataset.data.matchingItems.length,
     baseline: dataset.baseline,
-    totalControls: dataset.totalControls
-  })); 
-  console.log("This is the combined data var", combinedDataset);
+    totalControls: dataset.totalControls,
+  }));
   await horizontalBarGraph(combinedDataset);
 }
 // --------------------------------------------------------------------------------
 
-async function horizontalBarGraph(data, width = 600, height = 400) {
-  console.log("Data for D3 Bar Graph:", data, "Baseline:", data.baseline);
-
+async function horizontalBarGraph(data, width = 800, height = 600) {
   // Initialize JSDOM instance
   const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
   const d3 = await import("d3");
@@ -651,7 +641,12 @@ async function horizontalBarGraph(data, width = 600, height = 400) {
 
 // --------------------------------------------------------------------------------
 // Function for grouping control families
-function groupByControlFamily(uniqueControlIds) {
+function groupByControlFamily(
+  uniqueControlIds,
+  nistHighComparisonMatchingItems,
+  nistModerateComparisonMatchingItems,
+  nistLowComparisonMatchingItems
+) {
   // Define the control families
   const controlFamilies = {
     AC: "Access Control",
@@ -677,31 +672,233 @@ function groupByControlFamily(uniqueControlIds) {
   };
 
   // Initialize an object to store grouped control IDs
-  let groupedControlIds = {};
+  let groupedControlData = {};
+  let groupedNistHighComparison = {};
+  let groupedNistModerateComparison = {};
+  let groupedNistLowComparison = {};
 
   // Initialize arrays for each control family
   for (let family in controlFamilies) {
-    groupedControlIds[family] = [];
+    groupedControlData[family] = [];
+    groupedNistHighComparison[family] = [];
+    groupedNistModerateComparison[family] = [];
+    groupedNistLowComparison[family] = [];
   }
 
-  // Populate the groupedControlIds object
+  // Populate the groupedControlData object
   uniqueControlIds.forEach((id) => {
     let family = id.match(/^[a-z]+/i)[0].toUpperCase(); // Extract the family prefix and convert to uppercase
-    if (groupedControlIds[family]) {
-      groupedControlIds[family].push(id);
+    if (groupedControlData[family]) {
+      groupedControlData[family].push(id);
     }
   });
 
-  return groupedControlIds;
+  // Populate the groupedNistHighComparison object
+  nistHighComparisonMatchingItems.forEach((id) => {
+    let family = id.match(/^[a-z]+/i)[0].toUpperCase(); // Extract the family prefix and convert to uppercase
+    if (groupedNistHighComparison[family]) {
+      groupedNistHighComparison[family].push(id);
+    }
+  });
+
+  // Populate the groupedNistModerateComparison object
+  nistModerateComparisonMatchingItems.forEach((id) => {
+    let family = id.match(/^[a-z]+/i)[0].toUpperCase(); // Extract the family prefix and convert to uppercase
+    if (groupedNistModerateComparison[family]) {
+      groupedNistModerateComparison[family].push(id);
+    }
+  });
+
+  // Populate the groupedNistLowComparison object
+  nistLowComparisonMatchingItems.forEach((id) => {
+    let family = id.match(/^[a-z]+/i)[0].toUpperCase(); // Extract the family prefix and convert to uppercase
+    if (groupedNistLowComparison[family]) {
+      groupedNistLowComparison[family].push(id);
+    }
+  });
+
+  return {
+    groupedControlData,
+    groupedNistHighComparison,
+    groupedNistModerateComparison,
+    groupedNistLowComparison,
+  };
+}
+
+async function createStackedBarChart(
+  groupedNistHighComparison,
+  groupedNistModerateComparison,
+  groupedNistLowComparison,
+  width = 800,
+  height = 600
+) {
+  // Initialize JSDOM instance
+  const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
+  const d3 = await import("d3");
+
+  // Starting point for Margin Sizes
+  const marginLeft = 150; // <------- To-Do May remove, don't think I want to do it this way
+  const marginRight = 50;
+  const marginTop = 50;
+  const marginBottom = 200;
+
+  // Create the SVG container
+  const svg = d3
+    .select(dom.window.document.body)
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("viewBox", [0, 0, width, height])
+    .attr("style", "font: 20px Roboto, sans-serif;");
+
+  const data = [
+    groupedNistHighComparison,
+    groupedNistModerateComparison,
+    groupedNistLowComparison,
+  ].map((groupObject) => {
+    const counts = {};
+    Object.values(groupObject).forEach((groupArray) => {
+      groupArray.forEach((control) => {
+        const family = control.split("-")[0];
+        counts[family] = (counts[family] || 0) + 1; // <----- To-Do check if splitting correct
+      });
+    });
+    return counts;
+  });
+
+  // Grabs unique family names, IE AC, AU, etc
+  const families = Array.from(new Set(data.flatMap((d) => Object.keys(d))));
+
+  // Created the data for the stacked bars
+  const stack = d3.stack().keys(families);
+  const stackedData = stack(data);
+  console.log(JSON.stringify(stackedData, null, 2));
+
+  const x = d3
+    .scaleBand()
+    .domain(["High", "Moderate", "Low"]) // To-Do Maybe update?
+    .range([marginLeft, width - marginRight]) // To-Do Maybe update?
+    .padding(0.4); // To-Do Maybe update?
+
+  const y = d3
+    .scaleLinear()
+    .domain([0, d3.max(stackedData[stackedData.length - 1], (d) => d[1])]) // To-Do Maybe update?
+    .range([height - marginBottom, marginTop]); // To-Do Maybe update?
+
+  const color = d3.scaleOrdinal(d3.schemeCategory10).domain(families); // To-Do Update once Colors have been selected.
+  console.log(color.domain());
+
+  const layers = svg
+    .selectAll("g.layer")
+    .data(stackedData)
+    .enter()
+    .append("g")
+    // .append("g") To-Do: Remove?
+    .attr("fill", (d) => color(d.key));
+
+  layers
+    .selectAll("rect")
+    .data((d) => d)
+    .enter()
+    .append("rect")
+    .attr("x", (d, i) => x(["High", "Moderate", "Low"][i]))
+    .attr("y", (d) => y(d[1]))
+    .attr("height", (d) => y(d[0]) - y(d[1]))
+    .attr("width", x.bandwidth())
+    .each(function (d, i) {
+      // the 'nodes' parameter gives you access to all rectangles in the layer
+      const bar = d3.select(this);
+      const [y1, y2] = d;
+      const height = y(y1) - y(y2);
+      const parentData = d3.select(this.parentNode).datum();
+      const familyName = parentData.key; // this retrieves the correct family name based on the rectangle index
+      if (height > 15) {
+        // Adjust this value if needed
+        svg
+          .append("text")
+          .attr("x", +bar.attr("x") + x.bandwidth() / 2)
+          .attr("y", +bar.attr("y") + height / 2)
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .text(familyName)
+          .attr("fill", "white") // You can adjust the color as needed
+          .style("font-size", "14px");
+      }
+    });
+
+  svg
+    .append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0,${height - marginBottom})`)
+    .call(d3.axisBottom(x))
+    .selectAll("text") // Selects all text elements in the x-axis
+    .style("font-size", "18px") // Set the desired font size
+    .style("fill", "#ffffff"); // Set the desired font color
+
+  svg
+    .append("g")
+    .attr("class", "y-axis")
+    .attr("transform", `translate(${marginLeft},0)`)
+    .call(d3.axisLeft(y))
+    .selectAll("text") // Selects all text elements in the x-axis
+    .style("font-size", "18px") // Set the desired font size
+    .style("fill", "#ffffff"); // Set the desired font color
+  
+  const legend = svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${width - marginRight}, ${height - marginBottom + 40})`
+    ); // Adjust the 40 based on how far from the bottom you want the legend
+
+  families.forEach((family, i) => {
+    const legendItem = legend
+      .append("g")
+      .attr("transform", `translate(0,${i * 20})`); // Adjust the 20 based on spacing between legend items
+
+    // Add color box
+    legendItem
+      .append("rect")
+      .attr("width", 15) // Rectangle width
+      .attr("height", 15) // Rectangle height
+      .style("fill", color(family));
+
+    // Add label
+    legendItem
+      .append("text")
+      .attr("x", 20) // Position the text 20 units to the right of the rectangle
+      .attr("y", 10) // Adjust this based on desired vertical alignment
+      .text(family)
+      .style("font-size", "14px")
+      .style("fill", "#ffffff") // Font color, adjust as needed
+      .attr("alignment-baseline", "middle");
+  });
+
+  const svgContent = dom.window.document.querySelector("svg").outerHTML;
+
+  // Convert SVG to PNG buffer using svg-to-img
+  const pngBuffer = await sharp(Buffer.from(svgContent)).toBuffer();
+  await fs.writeFile(
+    `./compliance-images/vertical-stacked-bar-graph.png`,
+    pngBuffer
+  );
+
+  // Use sharp to process the image and save it
+  await sharp(pngBuffer)
+    .png()
+    .toFile("./compliance-images/vertical-stacked-bar-graph.png");
+
+  // Remove the SVG from JSDOM to avoid appending multiple SVGs in the same DOM
+  dom.window.document.querySelector("svg").remove();
 }
 
 // Function to transform data for donut chart
-async function transformDonutData(groupedData) {
-  return Object.keys(groupedData)
-    .filter((key) => groupedData[key].length > 0) // Filter out keys with zero count
+async function transformDonutData(groupedControlData) {
+  return Object.keys(groupedControlData)
+    .filter((key) => groupedControlData[key].length > 0) // Filter out keys with zero count
     .map((key) => ({
       name: key,
-      value: groupedData[key].length,
+      value: groupedControlData[key].length,
     }));
 }
 
@@ -783,9 +980,9 @@ async function createDonutChart(data, width = 500) {
 }
 
 // Create SVG image of donut chart
-async function generateDonutSVG(uniqueControlIds, width = 500) {
-  const groupedData = groupByControlFamily(uniqueControlIds);
-  const transformedData = await transformDonutData(groupedData);
+async function generateDonutSVG(groupedControlData, width = 500) {
+  // const groupedData = groupByControlFamily(uniqueControlIds); 
+  const transformedData = await transformDonutData(groupedControlData);
   const chartNode = await createDonutChart(transformedData, width);
 
   // Save the SVG to a file (using Node.js for this example)
@@ -796,7 +993,6 @@ async function generateDonutSVG(uniqueControlIds, width = 500) {
 // Function that orchestrates the entire process and ensures the correct data is passed between functions.
 async function main() {
   try {
-    
     // The first two values in argv are the path to node and the path to your script.
     const args = process.argv.slice(2);
 
@@ -809,12 +1005,35 @@ async function main() {
     const uniqueControlIds = await readAndProcessYaml(oscalFilePath);
 
     if (uniqueControlIds) {
-      // Call the new function to get grouped control IDs by family
-      const groupedControlData = groupByControlFamily(uniqueControlIds);
-      console.log(groupedControlData); // To view the output (you can remove this if not needed)
-
       const { nistHighComparison, nistModerateComparison, nistLowComparison } =
         await createComparison(uniqueControlIds);
+
+      // Call the function to get grouped control IDs by family
+      const nistHighComparisonMatchingItems =
+        nistHighComparison.matchingItems || [];
+      const nistModerateComparisonMatchingItems =
+        nistModerateComparison.matchingItems || [];
+      const nistLowComparisonMatchingItems =
+        nistLowComparison.matchingItems || [];
+
+      const {
+        groupedControlData,
+        groupedNistHighComparison,
+        groupedNistModerateComparison,
+        groupedNistLowComparison,
+      } = groupByControlFamily(
+        uniqueControlIds,
+        nistHighComparisonMatchingItems,
+        nistModerateComparisonMatchingItems,
+        nistLowComparisonMatchingItems
+      );
+
+      // At this point, you can run the createStackedBarChart function, assuming you have defined it elsewhere.
+      await createStackedBarChart(
+        groupedNistHighComparison,
+        groupedNistModerateComparison,
+        groupedNistLowComparison
+      );
 
       await createGraphs(
         nistHighComparison,
@@ -823,7 +1042,7 @@ async function main() {
       );
 
       // Generate the D3 Donut SVG
-      await generateDonutSVG(uniqueControlIds);
+      await generateDonutSVG(groupedControlData)
     } else {
       console.error("uniqueControlIds is undefined");
     }
@@ -832,14 +1051,12 @@ async function main() {
   }
 }
 
-  // Call the main function
-  main();
+// Call the main function
+main();
 
+const args = process.argv.slice(2); // The first two values in argv are the path to node and the path to your script.
 
+// Set the default file path
+const defaultOscalFilePath = "./defense-unicorns-distro/oscal-component.yaml";
 
-  const args = process.argv.slice(2); // The first two values in argv are the path to node and the path to your script.
-
-  // Set the default file path
-  const defaultOscalFilePath = "./defense-unicorns-distro";
-
-  const oscalFilePath = args.length > 0 ? args[0] : defaultOscalFilePath;
+const oscalFilePath = args.length > 0 ? args[0] : defaultOscalFilePath;

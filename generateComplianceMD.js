@@ -831,8 +831,9 @@ async function createStackedBarChart(
     .attr("class", "x-axis")
     .attr("transform", `translate(0,${height - marginBottom})`)
     .call(d3.axisBottom(x))
-    .selectAll("text") // Selects all text elements in the x-axis
+    .selectAll("text, path, line") // Selects all text elements in the x-axis
     .style("font-size", "18px") // Set the desired font size
+    .style("stroke", "#ffffff")
     .style("fill", "#ffffff"); // Set the desired font color
 
   svg
@@ -840,8 +841,9 @@ async function createStackedBarChart(
     .attr("class", "y-axis")
     .attr("transform", `translate(${marginLeft},0)`)
     .call(d3.axisLeft(y))
-    .selectAll("text") // Selects all text elements in the x-axis
+    .selectAll("text, path, line") // Selects all text elements in the x-axis
     .style("font-size", "18px") // Set the desired font size
+    .style("stroke", "#ffffff")
     .style("fill", "#ffffff"); // Set the desired font color
   
   const legend = svg

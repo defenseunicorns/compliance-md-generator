@@ -532,7 +532,6 @@ async function createGraphs(
   }));
   await horizontalBarGraph(combinedDataset);
 }
-// --------------------------------------------------------------------------------
 
 async function horizontalBarGraph(data, width = 800, height = 600) {
   // Initialize JSDOM instance
@@ -572,7 +571,7 @@ async function horizontalBarGraph(data, width = 800, height = 600) {
   // Append a rect for each data point.
   svg
     .append("g")
-    .attr("fill", "steelblue") // To-Do probably change color
+    .attr("fill", "#8a3ffc")
     .selectAll()
     .data(data)
     .join("rect")
@@ -584,7 +583,7 @@ async function horizontalBarGraph(data, width = 800, height = 600) {
   // Append a label for each data point.
   svg
     .append("g")
-    .attr("fill", "black") // To-Do probably change color
+    .attr("fill", "#FFFFFF")
     .attr("text-anchor", "end")
     .selectAll()
     .data(data)
@@ -609,7 +608,7 @@ async function horizontalBarGraph(data, width = 800, height = 600) {
     .call(d3.axisTop(x).ticks(5, "%"))
     .call((g) => g.select(".domain").remove())
     .selectAll("text")
-    .attr("fill", "#F7F8F9") // Font color
+    .attr("fill", "#C2C4C6") // Font color
     .style("font-family", "Roboto")
     .style("font-size", "20px"); // This updates the X Axis labels
 
@@ -620,7 +619,7 @@ async function horizontalBarGraph(data, width = 800, height = 600) {
     .call(d3.axisLeft(y).tickSizeOuter(0))
     .selectAll("text")
     .style("font-size", "20px") // This updates the Y Axis labels
-    .attr("fill", "#F7F8F9") // Font color
+    .attr("fill", "#C2C4C6") // Font color
     .style("font-family", "Roboto");
 
   // Get the SVG content and save it
@@ -639,7 +638,6 @@ async function horizontalBarGraph(data, width = 800, height = 600) {
   dom.window.document.querySelector("svg").remove();
 }
 
-// --------------------------------------------------------------------------------
 // Function for grouping control families
 function groupByControlFamily(
   uniqueControlIds,
@@ -784,8 +782,25 @@ async function createStackedBarChart(
     .scaleLinear()
     .domain([0, d3.max(stackedData[stackedData.length - 1], (d) => d[1])]) // To-Do Maybe update?
     .range([height - marginBottom, marginTop]); // To-Do Maybe update?
+  
+  const colorPalette = [
+    "#8a3ffc",
+    "#33b1ff",
+    "#007d79",
+    "#ff7eb6",
+    "#fa4d56",
+    "#fff1f1",
+    "#6fdc8c",
+    "#4589ff",
+    "#d12771",
+    "#d2a106",
+    "#08bdba",
+    "#bae6ff",
+    "#ba4e00",
+    "#d4bbff",
+  ];
 
-  const color = d3.scaleOrdinal(d3.schemeCategory10).domain(families); // To-Do Update once Colors have been selected.
+  const color = d3.scaleOrdinal(colorPalette).domain(families);
   console.log(color.domain());
 
   const layers = svg
@@ -936,11 +951,22 @@ async function createDonutChart(data, width = 500) {
   const color = d3
     .scaleOrdinal()
     .domain(data.map((d) => d.name))
-    .range(
-      d3
-        .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length)
-        .reverse()
-    );
+    .range([
+      "#8a3ffc", // Purple 60
+      "#33b1ff", // Cyan 40
+      "#007d79", // Teal 60
+      "#ff7eb6", // Magenta 40
+      "#fa4d56", // Red 50
+      "#fff1f1", // Red 10
+      "#6fdc8c", // Green 30
+      "#4589ff", // Blue 50
+      "#d12771", // Magenta 60
+      "#d2a106", // Yellow 40
+      "#08bdba", // Teal 40
+      "#bae6ff", // Cyan 20
+      "#ba4e00", // Orange 60
+      "#d4bbff", // Purple 30
+    ]);
 
   svg
     .append("g")

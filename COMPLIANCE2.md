@@ -12,11 +12,10 @@ The visuals below exclude Administrative and Not Applicable controls and focuses
 
 <br>
 
+# Compliance Baseline Percent Met
 <div align="center">
 
-## Control Family Breakdown By Baseline
-
-<img src="./compliance-images/vertical-stacked-bar-graph.png" alt="Control Family Breakdown By Baseline"/>
+<img src="./compliance-images/horizontal-bar-graph.png" alt="Percent of Controls Met Per Baseline"/>
 
 </div>
 

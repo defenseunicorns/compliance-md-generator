@@ -12,39 +12,11 @@ The visuals below exclude Administrative and Not Applicable controls and focuses
 
 <br>
 
-<table>
-<tr>
-<td>
-
-## NIST 800-53 High
-
-<img src="./compliance-images/pie-chart-NistHighComparison.svg" alt="NIST High"/>
-
-</td>
-<td>
-
-## NIST 800-53 Moderate
-
-<img src="./compliance-images/pie-chart-NistModerateComparison.svg" alt="NIST Moderate"/>
-
-</td>
-<td>
-
-## NIST 800-53 Low
-
-<img src="./compliance-images/pie-chart-NistLowComparison.svg" alt="NIST Low"/>
-
-</td>
-</tr>
-</table>
-
-<br>
-
 <div align="center">
 
-## Control Family Breakdown
+## Control Family Breakdown By Baseline
 
-<img src="./compliance-images/donutChart.svg" alt="Control Family Breakdown"/>
+<img src="./compliance-images/vertical-stacked-bar-graph.png" alt="Control Family Breakdown By Baseline"/>
 
 </div>
 

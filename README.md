@@ -13,7 +13,7 @@ If you are the maintainer or creator of a platform or system that leverages OSCA
 Run the Javascript file
 
 ```bash
-node generatePieChartSvg.js
+node generateComplianceMD.js ./path-to-oscal.yaml
 ```
 
 This creates the images and places them in a folder compliance-imaged located in the root of the codebase.
